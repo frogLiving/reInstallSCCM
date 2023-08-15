@@ -25,13 +25,13 @@ This script comes with several parameters that will need to be set in order to w
 If you don't want to use the WMI clean up script simply comment out line 97.
 
 ### Custom settings
-$path = <Path of install files></br>
+$path = "Path of install files"</br>
 
-$smsSite = <SiteCode>
+$smsSite = "SiteCode"
 
-$sccmHost = <SCCM host the client needs to talk to>
+$sccmHost = "SCCM host the client needs to talk to"
 
-$xmlURL = <xml configuration url>
+$xmlURL = "xml configuration url"
 
 ## How this works
 Basically, if you fill out the powershell script correctly.  You have are logged in  with a user that has permissions to the install files.  The script will reach out and download the files and store them in c:\Temp\<FolderName>.  It will then kick off the uninstall process do a series of cleanup and clean WMI for you.  Place the "sccmWMIFix.bat" in the install folder.  Once it has removed the agent it will begin re-installing the agent.
