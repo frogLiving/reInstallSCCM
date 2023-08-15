@@ -26,8 +26,11 @@ If you don't want to use the WMI clean up script simply comment out line 97.
 
 ### Custom settings
 $path = <Path of install files>
+
 $smsSite = <SiteCode>
+
 $sccmHost = <SCCM host the client needs to talk to>
+
 $xmlURL = <xml configuration url>
 
 ## How this works
