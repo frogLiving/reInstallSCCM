@@ -25,7 +25,7 @@ This script comes with several parameters that will need to be set in order to w
 If you don't want to use the WMI clean up script simply comment out line 97.
 
 ### Custom settings
-$path = <Path of install files>
+$path = <Path of install files></br>
 
 $smsSite = <SiteCode>
 
