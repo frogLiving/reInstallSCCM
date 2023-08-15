@@ -3,7 +3,7 @@
 ## Action - Manual re-installation of SCCM agent
 
 ## Purpose
-Those off chances you are unable to re-install the client from the SCCM console you must be able to login and fix the issue at hand.  This script handles the following items:
+There is an off chances you are unable to re-install the client from the SCCM console you must be able to login and fix the issue at hand.  This script handles the following items:
 * Function showing a spinning star showing process
 * A function to remove sccm from the affected device
 * Debug switch to help you ID any issues with the script
