@@ -12,7 +12,7 @@ $smsSite =
 $sccmHost = 
 $xmlURL =
 
-# Variables$removeClient = $false
+ # Variables$removeClient = $false
 $folder = $path -split "\\"
 $folder = $folder[$folder.count -1]
 $localPath = "C:\Temp\$folder"
@@ -40,17 +40,35 @@ function displayStatus {
 	}
 }
 
+#------------------------------- Copy Funtion ---------------------------------------
+
+function copyFiles {
+    param($lPath, $rPath)
+
+    # Test to see if the files on are on computer
+    $copyTst = Test-Path $lPath
+
+    if ($copyTst) { 
+        $a = Get-ChildItem -Recurse -Path $rPath
+        $b = Get-ChildItem -Recurse -Path $lPath
+        $c = Compare-Object -ReferenceObject $a -DifferenceObject $b
+
+        # Copy over the WMI fix
+        if (!Test-Path -Path "$lPath\sccmWMIFix.bat") {
+			xcopy $rPath\sccmWMIFix.bat $lPath /e /i
+		}
+    }
+
+    # start fresh copy
+    #if (!$copyTst) { Start-Process -FilePath "xcopy" -ArgumentList "$rPath $lPath /e /i" -Wait }
+    Start-Process -FilePath "xcopy" -ArgumentList "$var1 $var2 /e /i" -Wait
+}
+
+#------------------------------- Remove Function ---------------------------------------
+
 # Remove function
 function removeSCCM {
 	param($var1, $var2)
-	# copy first
-	$test = Test-Path $var2
-	if ($test) {
-		if (-not (Get-ChildItem -Path "$var2\sccmWMIFix.bat" -ErrorAction SilentlyContinue)) {
-			xcopy $var1\sccmWMIFix.bat $var2 /e /i
-		}
-	}
-	else { Start-Process -FilePath "xcopy" -ArgumentList "$var1 $var2 /e /i" -Wait }
 	
 	# Run cleanup process (ccmclean)
 	Start-Process -FilePath "$var2\ccmclean.exe" -ArgumentList "/q" -Wait
@@ -85,6 +103,9 @@ if (!$netSkip) {
 }
 elseif ($netSkip -eq $true -and $version -ne $null) { $removeClient = $true }
 
+# Copy Files
+copyFiles -localPath $localPath -rPath $path
+
 # Debug items.
 if ($debug) { Write-Output "Remove client state: $removeClient" }
 if ($debug) { Write-Output "OS version: $version" }
@@ -105,4 +126,4 @@ if ($installClient) {
 
 	# Display install status.
 	displayStatus -message "Installing!  " -processName "ccmsetup"
-}
+} 
