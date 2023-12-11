@@ -33,6 +33,8 @@ $sccmHost = "SCCM host the client needs to talk to"
 
 $xmlURL = "xml configuration url"
 
+$fixWMI = boolean (True to run and false to skip it)
+
 ## How this works
 Basically, if you fill out the powershell script correctly.  You have are logged in  with a user that has permissions to the install files.  The script will reach out and download the files and store them in c:\Temp\<FolderName>.  It will then kick off the uninstall process do a series of cleanup and clean WMI for you.  Place the "sccmWMIFix.bat" in the install folder.  Once it has removed the agent it will begin re-installing the agent.
 
