@@ -2,15 +2,17 @@
 # Date: 07/28/2023
 
 Param(	$version, 
-		$netSkip = $false, 
-		$debug = $false
+	$netSkip = $false, 
+	$debug = $false,
+ 	$fixWMI = $true
 )
 
 # Custom settings
-$path = 
-$smsSite = 
-$sccmHost = 
-$xmlURL =
+$path = ""
+$smsSite = ""
+$sccmHost = ""
+$xmlURL = ""
+$Exe = ""
 
  # Variables$removeClient = $false
 $folder = $path -split "\\"
@@ -45,6 +47,8 @@ function displayStatus {
 function copyFiles {
     param($lPath, $rPath)
 
+    if ($debug) { Write-Host "Entering copy Function" }
+
     # Test to see if the files on are on computer
     $copyTst = Test-Path $lPath
 
@@ -54,14 +58,11 @@ function copyFiles {
         $c = Compare-Object -ReferenceObject $a -DifferenceObject $b
 
         # Copy over the WMI fix
-        if (!Test-Path -Path "$lPath\sccmWMIFix.bat") {
-			xcopy $rPath\sccmWMIFix.bat $lPath /e /i
-		}
+        if (-not(Test-Path -Path "$lPath\sccmWMIFix.bat")) { xcopy $rPath\sccmWMIFix.bat $lPath /e /i }
     }
 
     # start fresh copy
-    #if (!$copyTst) { Start-Process -FilePath "xcopy" -ArgumentList "$rPath $lPath /e /i" -Wait }
-    Start-Process -FilePath "xcopy" -ArgumentList "$var1 $var2 /e /i" -Wait
+    if (!$copyTst) { Start-Process -FilePath "xcopy" -ArgumentList "$rPath $lPath /e /i" -Wait }
 }
 
 #------------------------------- Remove Function ---------------------------------------
@@ -71,17 +72,21 @@ function removeSCCM {
 	param($var1, $var2)
 	
 	# Run cleanup process (ccmclean)
-	Start-Process -FilePath "$var2\ccmclean.exe" -ArgumentList "/q" -Wait
-	displayStatus -message "UnInstalling!  " -processName "ccmclean"
+    if (Test-Path $var2) {
+	    Start-Process -FilePath "$var2\ccmclean.exe" -ArgumentList "/q"
+	    displayStatus -message "UnInstalling!" -processName "ccmclean"
 
-	# Remove old folders (ccmsetup & ccm)
-	Get-ChildItem C:\Windows\CCM | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-	Remove-Item C:\Windows\CCM-Install -Recurse -Force -ErrorAction SilentlyContinue
-	Remove-Item C:\Windows\ccmcache -Recurse -Force -ErrorAction SilentlyContinue
-	Remove-Item C:\Windows\ccmsetup -Recurse -ErrorAction SilentlyContinue
+	    # Remove old folders (ccmsetup & ccm)
+	    Get-ChildItem C:\Windows\CCM | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+	    Remove-Item C:\Windows\CCM-Install -Recurse -Force -ErrorAction SilentlyContinue
+	    Remove-Item C:\Windows\ccmcache -Recurse -Force -ErrorAction SilentlyContinue
+	    Remove-Item C:\Windows\ccmsetup -Recurse -ErrorAction SilentlyContinue
 
-	# Remove old cert keys in registery
-	Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\SystemCertificates\SMS\Certificates -Recurse -ErrorAction SilentlyContinue | Remove-Item
+	    # Remove old cert keys in registery
+	    Get-ChildItem -Path HKLM:\SOFTWARE\Microsoft\SystemCertificates\SMS\Certificates -Recurse -ErrorAction SilentlyContinue | Remove-Item
+        return $true
+    }
+    else { Write-Host "$var2 file path not found!" }
 }
 #-------------------------------- Functions end --------------------------------------
 
@@ -104,7 +109,7 @@ if (!$netSkip) {
 elseif ($netSkip -eq $true -and $version -ne $null) { $removeClient = $true }
 
 # Copy Files
-copyFiles -localPath $localPath -rPath $path
+copyFiles -lPath $localPath -rPath $path
 
 # Debug items.
 if ($debug) { Write-Output "Remove client state: $removeClient" }
@@ -112,18 +117,19 @@ if ($debug) { Write-Output "OS version: $version" }
 
 # Remove SCCM
 if ($removeClient) { 
-	removeSCCM -var1 $path -var2 $localPath	
-
-	# Run WMI Fix
-	Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait
-	$installClient = $true
+    $installClient = removeSCCM -var1 $path -var2 $localPath
+    # Run WMI Fix
+    if ($fixWMI) { Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait }
+    if ($debug) { Write-Host "Install client: $installClient" }
 }
 	
 #Re-install the client
 if ($installClient) {
-	if ($verion -eq 10) { Start-Process -FilePath $Exe -WorkingDirectory "$localPath" }
+    if ($debug) { Write-Host "Executable: $Exe" }
+
+	if ($verion -eq 10) { Start-Process -FilePath $Exe -WorkingDirectory $localPath }
 	else { Start-Process -FilePath "ccmsetup.exe" -WorkingDirectory "$localPath" -ArgumentList "/source:$localPath\ccmsetup", $smsSite }
 
 	# Display install status.
 	displayStatus -message "Installing!  " -processName "ccmsetup"
-} 
+}
