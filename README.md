@@ -11,7 +11,7 @@ There is an off chances you are unable to re-install the client from the SCCM co
 * Two statements for install sccm agent
 
 ## 2012+ clients
-When you use this script you need to use the -Version switch to set it to 10.  10 represents "Windows 10" and in this catagory I have lumbed in the following OS's:
+When you use this script you need to use the "-version" switch to set it to 10.  "10" represents "Windows 10" and in this catagory I have lumbed in the following OS's:
 * Windows server (12, 12R2, 2016, 2019, 2022)
 * Windows 10 / 11
 
@@ -22,18 +22,14 @@ While these clients are technically not supported.  If you have the correct agen
 This script comes with several parameters that will need to be set in order to work correctly.  I will list those below.  They are line item 9 of the script.
 
 ### WMI cleanup script
-If you don't want to use the WMI clean up script you can now run the following parameter to skipp this step: "-fixWMI 0"
+If you don't want to use the WMI clean up script you can now run the following parameter to skip this step: "-fixWMI 0"
 
 ### Custom settings
-$path = "Path of install files"</br>
-
-$smsSite = "SiteCode"
-
-$sccmHost = "SCCM host the client needs to talk to"
-
-$xmlURL = "xml configuration url"
-
-$fixWMI = boolean (True to run and false to skip it)
+- $path = "Path of install files"</br>
+- $smsSite = "SiteCode"
+- $sccmHost = "SCCM host the client needs to talk to"
+- $xmlURL = "xml configuration url"
+- $fixWMI = boolean (True to run and false to skip it)
 
 ## How this works
 Basically, if you fill out the powershell script correctly.  You have are logged in  with a user that has permissions to the install files.  The script will reach out and download the files and store them in c:\Temp\<FolderName>.  It will then kick off the uninstall process do a series of cleanup and clean WMI for you.  Place the "sccmWMIFix.bat" in the install folder.  Once it has removed the agent it will begin re-installing the agent.
