@@ -22,7 +22,7 @@ While these clients are technically not supported.  If you have the correct agen
 This script comes with several parameters that will need to be set in order to work correctly.  I will list those below.  They are line item 9 of the script.
 
 ### WMI cleanup script
-If you don't want to use the WMI clean up script simply comment out line 97.
+If you don't want to use the WMI clean up script you can now run the following parameter to skipp this step: "-fixWMI 0"
 
 ### Custom settings
 $path = "Path of install files"</br>
