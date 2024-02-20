@@ -1,7 +1,7 @@
 # Purpose: SCCM client install (SCCM script)
 # Date: 07/28/2023
 
-Param(	$version, 
+Param(	$version = 10, 
 	$netSkip = $false, 
 	$debug = $false,
  	$fixWMI = $true
