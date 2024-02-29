@@ -98,7 +98,7 @@ if ($debug -eq $true) {
 }
 
 # Connectivity test
-if (!$netSkip -eq $true) {
+if ($netSkip -ne $true) {
 	$ping = Test-Connection $sccmHost -Quiet
     $sccmXML = Invoke-Webrequest $xmlURL -DisableKeepAlive -ErrorAction SilentlyContinue
 	
@@ -120,13 +120,13 @@ if ($debug -eq $true) { Write-Output "OS version: $version" }
 if ($removeClient -eq $true) { 
     $installClient = removeSCCM -var1 $path -var2 $localPath
     # Run WMI Fix
-    if ($fixWMI-eq $true) { Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait }
-    if ($debug-eq $true) { Write-Host "Install client: $installClient" }
+    if ($fixWMI -eq $true) { Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait }
+    if ($debug -eq $true) { Write-Host "Install client: $installClient" }
 }
 	
 #Re-install the client
 if ($installClient -eq $true) {
-    if ($debug-eq $true) { Write-Host "Executable: $Exe" }
+    if ($debug -eq $true) { Write-Host "Executable: $Exe" }
 
 	if ($verion -eq 10) { Start-Process -FilePath $Exe -WorkingDirectory $localPath }
 	else { Start-Process -FilePath "ccmsetup.exe" -WorkingDirectory "$localPath" -ArgumentList "/source:$localPath\ccmsetup", $smsSite }
