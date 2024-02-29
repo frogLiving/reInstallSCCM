@@ -110,6 +110,7 @@ elseif ($netSkip -eq $true -and $version -ne $null) { $removeClient = $true }
 
 # Copy Files
 copyFiles -lPath $localPath -rPath $path
+Write-Output "Copying files"
 
 # Debug items.
 if ($debug -eq $true) { Write-Output "Remove client state: $removeClient" }
