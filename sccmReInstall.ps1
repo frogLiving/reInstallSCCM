@@ -113,10 +113,10 @@ copyFiles -lPath $localPath -rPath $path
 
 # Debug items.
 if ($debug -eq $true) { Write-Output "Remove client state: $removeClient" }
-if ($debug) -eq $true) { Write-Output "OS version: $version" }
+if ($debug -eq $true) { Write-Output "OS version: $version" }
 
 # Remove SCCM
-if ($removeClient-eq $true) { 
+if ($removeClient -eq $true) { 
     $installClient = removeSCCM -var1 $path -var2 $localPath
     # Run WMI Fix
     if ($fixWMI-eq $true) { Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait }
@@ -124,7 +124,7 @@ if ($removeClient-eq $true) {
 }
 	
 #Re-install the client
-if ($installClient-eq $true) {
+if ($installClient -eq $true) {
     if ($debug-eq $true) { Write-Host "Executable: $Exe" }
 
 	if ($verion -eq 10) { Start-Process -FilePath $Exe -WorkingDirectory $localPath }
