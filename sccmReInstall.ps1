@@ -91,19 +91,19 @@ function removeSCCM {
 #-------------------------------- Functions end --------------------------------------
 
 # Debug folder pathes
-if ($debug) {
+if ($debug -eq $true) {
 	Write-Output "Remote Path: $path"
 	Write-Output "Folder: $folder"
 	Write-Output "Local folder: $localPath"
 }
 
 # Connectivity test
-if (!$netSkip) {
+if (!$netSkip -eq $true) {
 	$ping = Test-Connection $sccmHost -Quiet
     $sccmXML = Invoke-Webrequest $xmlURL -DisableKeepAlive -ErrorAction SilentlyContinue
 	
 	if ($ping -eq $true -and $sccmXML.StatusCode -eq 200) { $removeClient = $true }
-	else { if ($debug) { Write-Output "Connectivity Test failed!"} }
+	else { if ($debug -eq $true) { Write-Output "Connectivity Test failed!"} }
 	
 }
 elseif ($netSkip -eq $true -and $version -ne $null) { $removeClient = $true }
@@ -112,20 +112,20 @@ elseif ($netSkip -eq $true -and $version -ne $null) { $removeClient = $true }
 copyFiles -lPath $localPath -rPath $path
 
 # Debug items.
-if ($debug) { Write-Output "Remove client state: $removeClient" }
-if ($debug) { Write-Output "OS version: $version" }
+if ($debug -eq $true) { Write-Output "Remove client state: $removeClient" }
+if ($debug) -eq $true) { Write-Output "OS version: $version" }
 
 # Remove SCCM
-if ($removeClient) { 
+if ($removeClient-eq $true) { 
     $installClient = removeSCCM -var1 $path -var2 $localPath
     # Run WMI Fix
-    if ($fixWMI) { Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait }
-    if ($debug) { Write-Host "Install client: $installClient" }
+    if ($fixWMI-eq $true) { Start-Process -FilePath "$localPath\sccmWMIFix.bat" -Wait }
+    if ($debug-eq $true) { Write-Host "Install client: $installClient" }
 }
 	
 #Re-install the client
-if ($installClient) {
-    if ($debug) { Write-Host "Executable: $Exe" }
+if ($installClient-eq $true) {
+    if ($debug-eq $true) { Write-Host "Executable: $Exe" }
 
 	if ($verion -eq 10) { Start-Process -FilePath $Exe -WorkingDirectory $localPath }
 	else { Start-Process -FilePath "ccmsetup.exe" -WorkingDirectory "$localPath" -ArgumentList "/source:$localPath\ccmsetup", $smsSite }
